@@ -1,0 +1,29 @@
+#include <FPT.h>
+
+int main(){
+
+double x[100],y[100],t;
+int i,a;
+
+G_init_graphics(600,600);
+
+
+ i=0;t=0;
+  while(i<6){
+    t=i*2*M_PI/6;
+    x[i]=300*cos(t)+300;
+    y[i]=300*sin(t)+300;
+    G_line(300,300,x[i],y[i]);
+    i++;
+  }
+
+i=0;a=1;
+while(i<6){
+G_line(x[i],y[i],x[a],y[a]);
+i++;
+a++;	
+if(a==6){a=0;}
+}
+
+
+}

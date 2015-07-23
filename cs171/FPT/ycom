@@ -1,0 +1,7 @@
+clist=""
+for name in $@; do
+  bname=" $name"
+  clist=("$clist""$bname")
+done
+
+g++  -I/Users/claudettechartrand/cs171/FPT/Source -I/Users/claudettechartrand/cs171/FPT/HeadersGPP /Users/claudettechartrand/cs171/FPT/DotosGPP/*.o $clist -L/usr/X11R6/lib -I/usr/X11R6/include -lm -lX11 -lXext

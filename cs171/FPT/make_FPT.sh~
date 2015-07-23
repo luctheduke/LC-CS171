@@ -1,0 +1,135 @@
+#!/bin/bash
+
+if [ ! -d "/usr/X11R6/lib" ] || [ ! -d "/usr/X11R6/include" ]; then
+    echo -e "You need to install XQuartz.\nThis can be found at http://xquartz.macosforge.org/landing/"
+    exit 1
+fi
+
+echo -e "XQuartz found. Continuing..."
+
+
+# Check if cc exists
+if ! which cc; then
+    
+    echo -e "Your computer does not have the c compiler (cc) installed.\nPlease install XCode and XCode Command Line Tools"
+    exit 1
+fi
+
+currentpwd=$(pwd)
+echo $currentpwd
+
+echo "Moving to ${currentpwd}/DotosC to run compile_dotos"
+cd $currentpwd/DotosC
+./compile_dotos
+if [ "$?" -ne 0 ]; then
+    echo -e "There was an error running compile_dotos in DotosC.\nExiting."
+    exit 1
+fi
+
+echo "Moving to ${currentpwd}/DotosGPP to run compile_dotos"
+cd $currentpwd/DotosGPP
+./compile_dotos
+if [ "$?" -ne 0 ]; then
+    echo -e "There was an error running compile_dotos in DotosGPP.\nExiting."
+    exit 1
+fi
+
+cd $currentpwd
+
+compiler=acom
+bin_path=/usr/local/bin
+
+
+echo "Checking if ${bin_path} exists."
+if [ ! -d $bin_path ]; then
+    echo "${bin_path} does not exist. Using /usr/bin/ instead."
+    bin_path=/usr/bin/
+else 
+    echo "${bin_path} does exist. Using it."
+fi
+
+
+exit 0
+
+echo "Checking if ${compiler} already exists in ${bin_path}."
+
+if [ -f $bin_path/$compiler ]; then
+    read -p "It does. Should we remove and replace ${compiler} in ${bin_path}? Type y or n: " remove
+    if [ $remove == "y" ] || [ $remove == "Y" ]; then
+        echo "Removing ${compiler} from ${bin_path}."
+        sudo rm $bin_path/$compiler
+        echo "Removed!"
+    elif [ $remove == "n" ] || [ $remove == "N" ]; then
+        echo "Leaving it alone. Exiting."
+        exit 0
+    else
+        echo "Did not recognize input. Leaving it alone and exiting."
+    fi
+
+fi
+
+echo "We are going to make a symbolic link to put ${compiler} (the compiler) into ${bin_path} (the directory that holds your binaries)."
+echo "The command line is going to ask for your password. This is the admin password that you use to unlock your computer."
+read -p "Press any key to continue. " var1
+
+if [ ! -f $compiler ]; then
+    touch $compiler
+else
+    echo "Removing ${compiler}"
+    rm $compiler
+fi
+
+
+echo -e "clist=\"\"" >> "$compiler"
+echo -e "for name in \$@; do" >> "$compiler"
+echo -e "  bname=\" \$name\"" >>  "$compiler"
+echo -e "  clist=(\"\$clist\"\"\$bname\")" >> "$compiler"
+echo -e "done\n" >> "$compiler"
+echo -e "cc  -I${currentpwd}/Source -I${currentpwd}/HeadersC ${currentpwd}/DotosC/*.o \$clist -L/usr/X11R6/lib -I/usr/X11R6/include -lm -lX11 -lXext" >> "$compiler"
+
+sudo chmod a+x $compiler
+
+sudo ln -s $currentpwd/$compiler $bin_path
+
+compiler=ycom
+echo "Checking if ${compiler} already exists in ${bin_path}."
+
+if [ -f $bin_path/$compiler ]; then
+    read -p "It does. Should we remove and replace ${compiler} in ${bin_path}? Type y or n: " remove
+    if [ $remove == "y" ] || [ $remove == "Y" ]; then
+        echo "Removing ${compiler} from ${bin_path}."
+        sudo rm $bin_path/$compiler
+        echo "Removed!"
+    elif [ $remove == "n" ] || [ $remove == "N" ]; then
+        echo "Leaving it alone. Exiting."
+        exit 0
+    else
+        echo "Did not recognize input. Leaving it alone and exiting."
+    fi
+
+fi
+
+
+echo "We are going to make a symbolic link to put ${compiler} (the compiler) into ${bin_path} (the directory that holds your binaries)."
+echo "The command line is going to ask for your password. This is the admin password that you use to unlock your computer."
+read -p "Press any key to continue. " var1
+
+if [ ! -f $compiler ]; then
+    touch $compiler
+else
+    echo "Removing ${compiler}"
+    rm $compiler
+fi
+
+
+echo -e "clist=\"\"" >> "$compiler"
+echo -e "for name in \$@; do" >> "$compiler"
+echo -e "  bname=\" \$name\"" >>  "$compiler"
+echo -e "  clist=(\"\$clist\"\"\$bname\")" >> "$compiler"
+echo -e "done\n" >> "$compiler"
+echo -e "g++  -I${currentpwd}/Source -I${currentpwd}/HeadersGPP ${currentpwd}/DotosGPP/*.o \$clist -L/usr/X11R6/lib -I/usr/X11R6/include -lm -lX11 -lXext" >> "$compiler"
+
+sudo chmod a+x $compiler
+
+sudo ln -s $currentpwd/$compiler $bin_path
+

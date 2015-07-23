@@ -1,0 +1,13 @@
+
+may9, 2011
+
+changed the interface of many functions from int
+params to double params so that g++ could pass
+doubles to them without giving warnings
+
+
+
+Jan 1, 2014
+added the function
+ G_no_wait_key()
+
